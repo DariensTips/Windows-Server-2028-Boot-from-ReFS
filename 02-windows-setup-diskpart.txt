@@ -1,0 +1,51 @@
+Title: Reserve 4 GB for WinRE and format the Windows partition as ReFS
+Author/channel: Darien Hawkins / Darien's Tips
+Purpose: Prepare a custom recovery partition during an alternative, fresh installation.
+Source script: WSVR28BREFS_Title-Script_20261120.txt
+Preparation date: 2026-11-20
+Tested environment: Windows Server 2028 Preview Setup in a Generation 2 Hyper-V VM using UEFI and GPT.
+Usage notes: Interactive command reference. Enter one command at a time in the shell indicated. Formatting erases the selected partition. Disk and partition numbers below are the lab values.
+
+1. Open DiskPart in Windows Setup
+Target and shell: The new Windows Server guest at the installation location screen. Press Shift+F10 for the Setup Command Prompt.
+Privileges: The command prompt opened by Setup supplies the required privileges.
+Prerequisite: Start again with a blank target disk. In Setup, select its unallocated space, choose Create Partition, and accept the default size. The Windows partition is still NTFS at this point.
+Purpose: Enter the interactive DiskPart console.
+
+DISKPART
+
+2. Identify the target disk and Windows partition
+Target and shell: The target VM, at the DISKPART> prompt. Use this prompt for sections 2 through 4.
+Privileges: The same Setup session.
+Prerequisite: Match the disk number and size to the intended target. The asterisk in the GPT column identifies a GPT disk. In LIST PART after selection, the asterisk at the left identifies the partition with focus.
+Purpose: Select the disk and the Windows partition. In this lab they are Disk 0 and Partition 3. Verify the selection in the second LIST PART before changing it.
+
+LIST DISK
+SELECT DISK 0
+LIST PART
+SELECT PART 3
+LIST PART
+
+3. Shrink the Windows partition, then format it
+Target, shell, and privileges: The selected Windows partition in the same Setup DiskPart session.
+Prerequisite: Verify focus and confirm that the target can be erased. Shrink while the partition is still NTFS. Continue only after DiskPart reports the shrink succeeded.
+Purpose: Free 4096 MB at the end of the Windows partition, format that partition as ReFS, and inspect its details.
+
+SHRINK DESIRED=4096
+FORMAT FS=REFS QUICK
+DETAIL PART
+
+4. Create and identify the NTFS recovery partition
+Target, shell, and privileges: The same Setup DiskPart session on the selected GPT disk.
+Prerequisite: The 4096 MB freed in section 3 is the available space in this lab. CREATE PART PRIMARY gives the new partition focus. Confirm it succeeded before formatting.
+Purpose: Use the free space for recovery, format it as NTFS, set the Windows recovery type GUID and attributes, then verify the result.
+
+CREATE PART PRIMARY
+FORMAT FS=NTFS QUICK
+SET ID="DE94BBA4-06D1-4D40-A16A-BFD50179D6AC"
+GPT ATTRIBUTES=0X8000000000000001
+DETAIL PART
+
+5. Return to Setup
+Target and privileges: The guest's existing Windows Setup session.
+Purpose: Refresh the disk list, identify the resized ReFS Windows partition and the separate 4 GB recovery partition, select the Windows partition, and continue installing.

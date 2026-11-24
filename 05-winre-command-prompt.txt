@@ -1,0 +1,19 @@
+Title: Locate and read the ReFS Windows volume from WinRE
+Author/channel: Darien Hawkins / Darien's Tips
+Purpose: Identify the installed Windows volume under WinRE's drive-letter assignment and verify its file system.
+Source script: WSVR28BREFS_Title-Script_20261120.txt
+Preparation date: 2026-11-20
+Tested environment: Windows Recovery Environment launched by the Windows Server 2028 Preview guest.
+Usage notes: Run these read-only queries in WinRE Command Prompt after the restart.
+
+Target: The installed guest's Windows Recovery Environment.
+Shell and privileges: Advanced options > Command Prompt. Use an authorized administrator account if WinRE prompts.
+Prerequisites: Boot into WinRE from the installed guest, choose Troubleshoot, and open Advanced options.
+
+1. View the boot configuration. Find the Windows Boot Loader entry for the installed operating system and read its osdevice value. Drive letters can change in recovery.
+
+bcdedit
+
+2. Query the drive shown by osdevice. Here the Windows volume was C:. Substitute the actual letter if yours differs. Check the File System Name line for ReFS.
+
+fsutil fsinfo volumeinfo c:

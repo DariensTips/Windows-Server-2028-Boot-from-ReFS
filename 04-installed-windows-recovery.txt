@@ -1,0 +1,23 @@
+Title: Check Windows RE and request one recovery boot
+Author/channel: Darien Hawkins / Darien's Tips
+Purpose: Verify Windows RE registration and test booting the installed guest into recovery.
+Source script: WSVR28BREFS_Title-Script_20261120.txt
+Preparation date: 2026-11-20
+Tested environment: Installed Windows Server 2028 Preview in the Generation 2 Hyper-V lab.
+Usage notes: Enter each example separately. The last command immediately restarts the guest.
+
+Target for all three examples: The installed Windows Server guest, before entering recovery.
+Shell and required privileges: Run Windows PowerShell as administrator in that guest.
+Prerequisites: Windows Setup is complete. Save open work and have access to the VM console for the restart.
+
+1. Display Windows RE status and its registered location.
+
+reagentc /info
+
+2. With Windows RE enabled and its location identified, request recovery on the next boot. Check the success message before restarting.
+
+reagentc /boottore
+
+3. Restart the guest. At Choose an option, select Troubleshoot. From Advanced options, open Command Prompt for the next reference.
+
+Restart-Computer
